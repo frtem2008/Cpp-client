@@ -3,7 +3,7 @@
 #include <regex>
 #include <string>
 
-#include "Communication.h"
+#include "SocketCommunication.h"
 #include "Login.h"
 
 static int fileAvailable(const char* fileName);
@@ -23,7 +23,7 @@ int login(SOCKET server, std::string root)
   std::string command, reply;
 
   puts("login started...\n");
-
+		  
   if (fileAvailable(USER_ID_FILE_NAME)) //try to login with id from file
   {
 	if (readFromFile(USER_ID_FILE_NAME, &idToSend))
@@ -57,7 +57,7 @@ int login(SOCKET server, std::string root)
 	else
 	  puts("Id file exists, but reading id failed, generating new id..."), generate = 1;
   }
-  
+
   while (generate) //log in using new id
   {
 	idToSend = generateLoginId();
@@ -102,6 +102,17 @@ static int contains(std::string str, std::string substr)
   return str.find(substr) != std::string::npos;
 }
 
+
+static std::vector<std::string> split(const std::string& input, const std::string& regex)
+{
+  // passing -1 as the submatch index parameter performs splitting
+  std::regex re(regex);
+  std::sregex_token_iterator
+	first{ input.begin(), input.end(), re, -1 },
+	last;
+  return { first, last };
+}
+
 static int readFromFile(const char* fileName, int* id)
 {
   char line[32];
@@ -121,7 +132,7 @@ static int readFromFile(const char* fileName, int* id)
   return 1;
 }
 
-static int saveIdToFile(const char *fileName, int idToWrite)
+static int saveIdToFile(const char* fileName, int idToWrite)
 {
   if (fileAvailable(fileName))
   {
@@ -131,21 +142,6 @@ static int saveIdToFile(const char *fileName, int idToWrite)
 	return 1;
   }
   return 0;
-}
-
-
-static std::vector<std::string> split(const std::string& input, const std::string& regex) {
-  // passing -1 as the submatch index parameter performs splitting
-  std::regex re(regex);
-  std::sregex_token_iterator
-	first{ input.begin(), input.end(), re, -1 },
-	last;
-  return { first, last };
-}
-
-static int generateLoginId()
-{
-  return rand() % 32767 + 1; //from 1 to 32768
 }
 
 static int fileAvailable(const char* fileName)
@@ -162,4 +158,9 @@ static int fileAvailable(const char* fileName)
 
   reader.close();
   return available;
+}
+
+static int generateLoginId()
+{
+  return rand() % 32767 + 1; //from 1 to 32768
 }

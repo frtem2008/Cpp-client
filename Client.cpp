@@ -3,8 +3,9 @@
 #pragma comment(lib,"ws2_32.lib")
 #include <stdio.h>
 
-#include "Communication.h"
+#include "SocketCommunication.h"
 #include "Login.h"
+#include "CommandProcess.h"
 
 int main(int argc, char* argv[])
 {
@@ -13,19 +14,13 @@ int main(int argc, char* argv[])
   SOCKADDR_IN serverAddress;
 
   char receiveBuffer[2048];
+  int id;
 
   //Connect to remote server
   if (connectToServer("127.0.0.1", 26780, &wsa, &server, &serverAddress))
   {
-	login(server, "C");/*
-	if (sendMessage(server, "C$10"))
-	  puts("Message sent");
-	else
-	  puts("Sending failed");*/
-	if (receiveMessage(server, receiveBuffer, sizeof receiveBuffer))
-	  puts(receiveBuffer);
-	else
-	  puts("Receiving failed");
+	id = login(server, "C");
+	startClientCommandProcess(server, id);
   }
   else
   {

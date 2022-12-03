@@ -129,15 +129,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
-    <ClCompile Include="Communication.cpp" />
+    <ClCompile Include="CommandProcess.cpp" />
+    <ClCompile Include="SocketCommunication.cpp" />
     <ClCompile Include="Login.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Communication.h" />
+    <ClInclude Include="CommandProcess.h" />
+    <ClInclude Include="SocketCommunication.h" />
     <ClInclude Include="Login.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="userUniID1.txt" />
+    <Text Include="userUniID.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
