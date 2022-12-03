@@ -34,7 +34,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="userUniID.txt">
+    <Text Include="userUniID1.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
   </ItemGroup>
