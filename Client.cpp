@@ -19,8 +19,10 @@ int main(int argc, char* argv[])
   //Connect to remote server
   if (connectToServer("127.0.0.1", 26780, &wsa, &server, &serverAddress))
   {
-	id = login(server, "C");
-	startClientCommandProcess(server, id);
+	if (login(server, "C", &id))
+	  startClientCommandProcess(server, id);
+	else
+	  puts("login failed");
   }
   else
   {

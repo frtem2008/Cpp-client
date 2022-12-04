@@ -15,7 +15,7 @@ static int contains(std::string str, std::string substr);
 
 static int generateLoginId();
 
-int login(SOCKET server, std::string root)
+int login(SOCKET server, std::string root, int *id)
 {
   int idToSend;
   int generate = 1;
@@ -31,8 +31,13 @@ int login(SOCKET server, std::string root)
 	  printf("Id read from file: %i, started logging in...\n", idToSend);
 	  command = root + "$" + std::to_string(idToSend);
 	  sendMessage(server, command.c_str());
-	  receiveMessage(server, received, sizeof received);
+	  if (receiveMessage(server, received, sizeof received) == 0)
+	  {
+		printf("Error while reading occured!!!\n");
+		return 0;
+	  }
 	  reply = std::string(received);
+	  printf("REPLY: %s\n", reply.c_str());
 	  if (contains(reply, "LOGIN$INVALID_ID$ONLINE"))
 	  {
 		printf("Id: %i is allready online WTF, quitting...\n", idToSend);
@@ -63,17 +68,26 @@ int login(SOCKET server, std::string root)
 	idToSend = generateLoginId();
 	printf("Generated id: %i, logging in...\n", -idToSend);
 	command = root + "$" + std::to_string(-idToSend);
-	sendMessage(server, command.c_str());
+	if (sendMessage(server, command.c_str()) == 0)
+	{
+	  puts("Sending id message failed\n");
+	  exit(1);
+	}
 
-	receiveMessage(server, received, sizeof received);
+	if (receiveMessage(server, received, sizeof received) == 0)
+	{
+	  puts("Getting id message failed\n");
+	  exit(1);
+	}	  
 	reply = std::string(received);
+	printf("REPLY: %s\n", reply.c_str());
 
 	if (contains(reply, "LOGIN$INVALID_ID$EXISTS"))
 	  printf("Id: %i is allready registered, trying another one...\n", idToSend);
 	else if (contains(reply, "LOGIN$INVALID_ID$ONLINE"))
 	{
 	  printf("Id: %i is allready online WTF, quitting...\n", idToSend);
-	  return 0;
+	  exit(1);
 	}
 	else if (contains(reply, "LOGIN$CONNECT$"))
 	{
@@ -83,7 +97,7 @@ int login(SOCKET server, std::string root)
 	else
 	{
 	  puts("Something strange happened, quitting...\n");
-	  return 0;
+	  exit(1);
 	}
   }
 
@@ -92,6 +106,7 @@ int login(SOCKET server, std::string root)
   else
 	puts("Failed to save generated id to file\n");
 
+  *id = idToSend;
   puts("Login done");
 
   return 1;
@@ -101,7 +116,6 @@ static int contains(std::string str, std::string substr)
 {
   return str.find(substr) != std::string::npos;
 }
-
 
 static std::vector<std::string> split(const std::string& input, const std::string& regex)
 {
